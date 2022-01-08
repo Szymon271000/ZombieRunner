@@ -5,7 +5,6 @@ using UnityEngine;
 public class EnemyHealth : MonoBehaviour
 {
     [SerializeField] float hitPoints = 100f;
-    Weapon weapon;
 
     // create public method which reduces hitpoints by the amount of damage
     public void TakeDamage(float damage)
