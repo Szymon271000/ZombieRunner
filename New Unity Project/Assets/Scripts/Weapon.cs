@@ -10,50 +10,68 @@ public class Weapon : MonoBehaviour
     [SerializeField] float damage = 10f;
     [SerializeField] ParticleSystem muzzleFlash;
     [SerializeField] GameObject hitEffect;
+    [SerializeField] Ammo ammoSlot;
+    [SerializeField] AmmoType ammoType;
+    [SerializeField] float timeBetweenShots = 0.5f;
+
+    bool canShoot = true;
+
+    private void OnEnable()
+    {
+        canShoot = true;
+    }
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetMouseButtonDown(0) && canShoot == true)
         {
-            Shoot();
+            StartCoroutine(Shoot());
         }
     }
 
-    void Shoot()
+    IEnumerator Shoot()
     {
-        PlayMuzzleFlash();
-        ProcessRaycast();
-    }
-
-    void PlayMuzzleFlash()
-    {
-        muzzleFlash.Play();
-    }
-
-    void ProcessRaycast()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(FPCamera.transform.position, FPCamera.transform.forward, out hit, range))
+        canShoot = false;
+        if (ammoSlot.GetCurrentAmmo(ammoType) > 0)
         {
-            CreateHitImpact(hit);
-            // TODO: add some hit effect for visual players
-            EnemyHealth target = hit.transform.GetComponent<EnemyHealth>();
-            if (target == null)
+            PlayMuzzleFlash();
+            ProcessRaycast();
+            ammoSlot.ReduceCurrentAmmo(ammoType);
+        }
+        yield return new WaitForSeconds(timeBetweenShots);
+        canShoot = true;
+        //}
+
+        void PlayMuzzleFlash()
+        {
+            muzzleFlash.Play();
+        }
+
+        void ProcessRaycast()
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(FPCamera.transform.position, FPCamera.transform.forward, out hit, range))
+            {
+                CreateHitImpact(hit);
+                // TODO: add some hit effect for visual players
+                EnemyHealth target = hit.transform.GetComponent<EnemyHealth>();
+                if (target == null)
+                {
+                    return;
+                }
+                target.TakeDamage(damage);
+                // call a method on EnemyHealth that decreases the enemy's health
+            }
+            else
             {
                 return;
             }
-            target.TakeDamage(damage);
-            // call a method on EnemyHealth that decreases the enemy's health
+
         }
-        else
+
+        void CreateHitImpact(RaycastHit hit)
         {
-            return;
+            GameObject impact = Instantiate(hitEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            Destroy(impact, .1f);
         }
-
-    }
-
-    void CreateHitImpact(RaycastHit hit)
-    {
-        GameObject impact = Instantiate(hitEffect, hit.point, Quaternion.LookRotation(hit.normal));
-        Destroy(impact, .1f);
     }
 }
