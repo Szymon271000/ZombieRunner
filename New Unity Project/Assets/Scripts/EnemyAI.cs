@@ -6,22 +6,30 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    [SerializeField] Transform target; // position is the location where the object is
+    Transform target; // position is the location where the object is
     [SerializeField] float chaseRange = 5f;
     [SerializeField] float turnSpeed = 5f;
 
     NavMeshAgent navMeshAgent;
     float distanceToTarget = Mathf.Infinity;
     bool isProvoked = false;
+    EnemyHealth health;
 
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>(); // gets the component NavMeshAgent from the object where the script is
+        health = GetComponent<EnemyHealth>();
+        target = FindObjectOfType<PlayerHealth>().transform;
     }
 
     void Update()
     {
-
+        if (health.IsDead())
+        {
+            enabled = false;
+            navMeshAgent.enabled = false;
+            
+        }
         distanceToTarget = Vector3.Distance(target.position, transform.position); //distance between target and object of the script
         if (isProvoked)
         {

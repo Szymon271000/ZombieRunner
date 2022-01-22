@@ -14,7 +14,7 @@ public class WeaponZoom : MonoBehaviour
     bool zoomedInToggle = false;
 
 
-    private void OnDisable()
+    void OnDisable()
     {
         ZoomOut();
     }

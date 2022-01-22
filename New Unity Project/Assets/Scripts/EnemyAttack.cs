@@ -18,6 +18,6 @@ public class EnemyAttack : MonoBehaviour
             return;
         }
         target.TakeDamage(damage);
-        Debug.Log("Bang Bank");
+        target.GetComponent<DisplayDamage>().ShowDamageImpact();
     }
 }
